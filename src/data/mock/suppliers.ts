@@ -1,0 +1,55 @@
+import type { Supplier } from "@/types/domain";
+import { ago } from "./time";
+
+export const SUPPLIERS: Supplier[] = [
+  {
+    id: "SUP-VND",
+    name: "Vanderhof Industries",
+    code: "VND",
+    region: "US · Wisconsin",
+    sourceCount: 12,
+    health: "HEALTHY",
+    lastSync: ago(3),
+    formats: ["XLSX", "PDF", "CSV"],
+  },
+  {
+    id: "SUP-NSM",
+    name: "Northstar Metalworks",
+    code: "NSM",
+    region: "US · Ohio",
+    sourceCount: 8,
+    health: "HEALTHY",
+    lastSync: ago(6),
+    formats: ["PDF", "DXF"],
+  },
+  {
+    id: "SUP-KSF",
+    name: "Kessler Fittings GmbH",
+    code: "KSF",
+    region: "DE · Stuttgart",
+    sourceCount: 5,
+    health: "DEGRADED",
+    lastSync: ago(28),
+    formats: ["XLSX", "XML"],
+  },
+  {
+    id: "SUP-PVF",
+    name: "Pacific Valve & Flange",
+    code: "PVF",
+    region: "US · California",
+    sourceCount: 6,
+    health: "HEALTHY",
+    lastSync: ago(9),
+    formats: ["PDF", "CSV"],
+  },
+  {
+    id: "SUP-AFS",
+    name: "Atlas Fluid Systems",
+    code: "AFS",
+    region: "UK · Manchester",
+    sourceCount: 4,
+    health: "CRITICAL",
+    lastSync: ago(52),
+    formats: ["XLSX", "PDF"],
+  },
+];

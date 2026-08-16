@@ -1,0 +1,102 @@
+/* ============================================================
+   UNIFORGE — DESIGN TOKENS
+   Theme: Dark Industrial Engineering Precision
+   Palette: near-black graphite · warm white · muted grey
+            cyan accent · restrained green · amber · controlled red
+   ============================================================ */
+
+:root,
+.dark {
+  color-scheme: dark;
+
+  /* ---- Surfaces ---- */
+  --uf-bg: #0b0d0f;
+  --uf-bg-deep: #07090a;
+  --uf-bg-raised: #0f1215;
+  --uf-surface: #111417;
+  --uf-surface-raised: #161a1e;
+  --uf-surface-2: #1c2126;
+  --uf-border: #232a31;
+  --uf-border-strong: #323b44;
+  --uf-border-faint: #171c21;
+
+  /* ---- Text ---- */
+  --uf-text-primary: #eaedf0;
+  --uf-text-secondary: #a6afb7;
+  --uf-text-tertiary: #6e7882;
+
+  /* ---- Accent / status ---- */
+  --uf-accent: #37c7ea;
+  --uf-accent-bright: #7be4f8;
+  --uf-accent-dim: rgba(55, 199, 234, 0.1);
+  --uf-accent-line: rgba(55, 199, 234, 0.32);
+  --uf-success: #45c181;
+  --uf-success-dim: rgba(69, 193, 129, 0.1);
+  --uf-success-line: rgba(69, 193, 129, 0.32);
+  --uf-warning: #d9a13b;
+  --uf-warning-dim: rgba(217, 161, 59, 0.1);
+  --uf-warning-line: rgba(217, 161, 59, 0.32);
+  --uf-critical: #d0584a;
+  --uf-critical-dim: rgba(208, 88, 74, 0.1);
+  --uf-critical-line: rgba(208, 88, 74, 0.32);
+  --uf-info: #5b8db8;
+
+  /* ---- Typography ---- */
+  --uf-font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --uf-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
+
+  /* ---- Radii ---- */
+  --uf-radius-xs: 2px;
+  --uf-radius-sm: 3px;
+  --uf-radius-md: 5px;
+  --uf-radius-lg: 8px;
+
+  /* ---- Effects ---- */
+  --uf-shadow-panel: inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 28px rgba(0, 0, 0, 0.38);
+  --uf-shadow-glow: 0 0 0 1px var(--uf-accent-line),
+    0 0 20px rgba(55, 199, 234, 0.16);
+
+  /* ---- Blueprint grid texture ---- */
+  --uf-grid: linear-gradient(rgba(140, 170, 190, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 170, 190, 0.045) 1px, transparent 1px);
+  --uf-grid-size: 34px 34px;
+
+  /* ------------------------------------------------------------
+     shadcn / tailwind mapping — industrial dark
+     ------------------------------------------------------------ */
+  --background: #0b0d0f;
+  --foreground: #eaedf0;
+  --card: #111417;
+  --card-foreground: #eaedf0;
+  --popover: #161a1e;
+  --popover-foreground: #eaedf0;
+  --primary: #37c7ea;
+  --primary-foreground: #061013;
+  --secondary: #1c2126;
+  --secondary-foreground: #eaedf0;
+  --muted: #14181c;
+  --muted-foreground: #7a848e;
+  --accent: #1c2126;
+  --accent-foreground: #eaedf0;
+  --destructive: #d0584a;
+  --border: #232a31;
+  --input: #232a31;
+  --ring: rgba(55, 199, 234, 0.45);
+  --radius: 0.4rem;
+  --sidebar: #0f1215;
+  --sidebar-foreground: #eaedf0;
+  --sidebar-primary: #37c7ea;
+  --sidebar-primary-foreground: #061013;
+  --sidebar-accent: #1c2126;
+  --sidebar-accent-foreground: #eaedf0;
+  --sidebar-border: #232a31;
+  --sidebar-ring: rgba(55, 199, 234, 0.45);
+  --chart-1: #37c7ea;
+  --chart-2: #45c181;
+  --chart-3: #d9a13b;
+  --chart-4: #5b8db8;
+  --chart-5: #d0584a;
+}
