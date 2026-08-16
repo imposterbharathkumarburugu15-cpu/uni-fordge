@@ -103,8 +103,7 @@ export function Intelligence() {
               <div className="uf-progress" role="meter" aria-label={bar.label}>
                 <motion.span
                   initial={{ width: 0 }}
-                  whileInView={{ width: `${Math.round(bar.value * 100)}%` }}
-                  viewport={{ once: true }}
+                  animate={{ width: `${Math.round(bar.value * 100)}%` }}
                   transition={{ duration: 0.8, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                   style={{ background: bar.tone }}
                 />

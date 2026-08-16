@@ -37,8 +37,7 @@ export function ForgeExample() {
         <div className="flex items-center justify-center">
           <motion.span
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="flex flex-col items-center"
           >
@@ -54,8 +53,7 @@ export function ForgeExample() {
             <motion.div
               key={item.key}
               initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 + i * 0.08 }}
               className="rounded-sm border border-[var(--uf-border)] bg-[var(--uf-surface)] p-3"
             >

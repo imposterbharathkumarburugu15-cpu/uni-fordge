@@ -82,8 +82,7 @@ export function Engines() {
               <motion.article
                 key={engine.index}
                 initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: i * 0.1 }}
                 className="flex flex-col rounded-md border border-[var(--uf-border)] bg-[var(--uf-surface)] transition-colors hover:border-[var(--uf-border-strong)]"
               >
