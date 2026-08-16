@@ -6,7 +6,10 @@ interface LogoProps {
 /** UNIFORGE wordmark — the O is a geometric forge mark (two ingots + beam). */
 export function Logo({ className = "", markClassName = "" }: LogoProps) {
   return (
-    <span className={`inline-flex items-baseline gap-1 font-bold tracking-[0.08em] ${className}`}>
+    <span
+      className={`inline-flex items-baseline gap-1 font-bold tracking-[0.08em] ${className}`}
+      style={{ fontFamily: "var(--uf-font-condensed)" }}
+    >
       UNIF
       <svg
         viewBox="0 0 22 18"

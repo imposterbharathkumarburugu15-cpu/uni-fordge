@@ -41,9 +41,17 @@
   --uf-critical-line: rgba(208, 88, 74, 0.32);
   --uf-info: #5b8db8;
 
-  /* ---- Typography ---- */
+  /* ---- Typography ----
+     HEADINGS       → condensed bold
+     SECTION LABELS → condensed / uppercase
+     BODY TEXT      → clean sans-serif
+     DATA / IDS     → monospace
+     STATUS         → technical condensed
+  */
   --uf-font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
+  --uf-font-condensed: "IBM Plex Sans Condensed", "IBM Plex Sans",
+    system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --uf-font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo,
     Consolas, monospace;
 

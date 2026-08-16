@@ -16,7 +16,7 @@ export function ReadyShipment() {
     >
       <div className="flex flex-wrap items-center gap-3 border-b border-[var(--uf-success-line)] px-5 py-3">
         <PackageCheck className="size-4 text-[var(--uf-success)]" aria-hidden />
-        <h2 className="uf-mono text-[12px] font-medium uppercase tracking-[0.14em] text-[var(--uf-success)]">
+        <h2 className="text-[12px] font-semibold uppercase tracking-[0.14em] [font-family:var(--uf-font-condensed)] text-[var(--uf-success)]">
           {queue.length} products ready for shipment
         </h2>
         <span className="ml-auto hidden text-[12px] text-[var(--uf-text-secondary)] sm:block">

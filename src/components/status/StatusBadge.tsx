@@ -93,7 +93,7 @@ export function StatusBadge({
   const Icon = ICONS[status];
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] whitespace-nowrap ${className}`}
+      className={`uf-status inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 text-[10.5px] whitespace-nowrap ${className}`}
       style={{ color: style.fg, background: style.bg, borderColor: style.border }}
     >
       {icon ??

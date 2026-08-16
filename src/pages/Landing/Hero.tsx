@@ -16,7 +16,7 @@ export function Hero({ onExplore }: HeroProps) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="uf-mono flex items-center gap-3 text-[11px] uppercase tracking-[0.18em] text-[var(--uf-accent)]"
+            className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.18em] [font-family:var(--uf-font-condensed)] text-[var(--uf-accent)]"
           >
             <span className="text-[var(--uf-text-tertiary)]">01 — PLATFORM · CATALOG INTELLIGENCE</span>
           </motion.p>

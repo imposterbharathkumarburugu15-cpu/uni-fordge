@@ -27,7 +27,7 @@ export function AppTopBar({ onSearch }: { onSearch: () => void }) {
               key={m.id}
               to={m.path}
               className={({ isActive }) =>
-                `relative whitespace-nowrap rounded-sm px-2.5 py-2 uf-mono text-[10.5px] font-medium uppercase tracking-[0.1em] transition-colors ${
+                `relative whitespace-nowrap rounded-sm px-2.5 py-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] [font-family:var(--uf-font-condensed)] transition-colors ${
                   isActive
                     ? "text-[var(--uf-text-primary)]"
                     : "text-[var(--uf-text-tertiary)] hover:text-[var(--uf-text-secondary)]"

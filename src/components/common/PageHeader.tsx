@@ -26,7 +26,7 @@ export function PageHeader({
               </span>
             )}
             <span
-              className={`uf-mono text-[10.5px] uppercase tracking-[0.14em] ${
+              className={`text-[11px] font-semibold uppercase tracking-[0.16em] [font-family:var(--uf-font-condensed)] ${
                 i === breadcrumb.length - 1
                   ? "text-[var(--uf-accent)]"
                   : "text-[var(--uf-text-tertiary)]"
