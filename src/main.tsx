@@ -4,6 +4,7 @@ import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import React, { StrictMode, useEffect } from "react";
+import { InstrumentationProvider } from "./instrumentation";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, useLocation } from "react-router";
 import { AppRoutes } from "@/app/router/AppRoutes";
@@ -101,13 +102,15 @@ createRoot(document.getElementById("root")!).render(
       <ToolbarErrorBoundary>
         <VlyToolbar />
       </ToolbarErrorBoundary>
-      <ConvexAuthProvider client={convex}>
-        <BrowserRouter>
-          <RouteSyncer />
-          <AppRoutes />
-        </BrowserRouter>
-        <Toaster />
-      </ConvexAuthProvider>
+      <InstrumentationProvider>
+        <ConvexAuthProvider client={convex}>
+          <BrowserRouter>
+            <RouteSyncer />
+            <AppRoutes />
+          </BrowserRouter>
+          <Toaster />
+        </ConvexAuthProvider>
+      </InstrumentationProvider>
     </RootErrorBoundary>
   </StrictMode>,
 );
