@@ -4,11 +4,10 @@ import {
   BookOpen,
   Check,
   FileText,
-  Gavel,
   Server,
   ShieldCheck,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Mono, Timestamp } from "@/components/common/Mono";
@@ -38,29 +37,18 @@ export default function Resolve() {
 
   const open = conflicts.filter((c) => c.status === "OPEN");
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedId, setSelectedId] = useState<string | null>(
-    searchParams.get("conflict") ?? open[0]?.id ?? null,
-  );
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    const fromQuery = searchParams.get("conflict");
-    if (fromQuery && conflicts.some((c) => c.id === fromQuery)) {
-      setSelectedId(fromQuery);
-    } else if (!selectedId && open.length > 0) {
-      setSelectedId(open[0].id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
-  const active = conflicts.find((c) => c.id === selectedId) ?? open[0];
+  // Selected conflict is derived from the ?conflict= query param, falling
+  // back to the first open conflict — no state duplication, deep links work.
+  const fromQuery = searchParams.get("conflict");
+  const active = conflicts.find((c) => c.id === fromQuery) ?? open[0];
   const product = products.find((p) => p.id === active?.productId);
   const resolution = active
     ? resolutions.find((r) => r.conflictId === active.id)
     : undefined;
 
   const select = (id: string) => {
-    setSelectedId(id);
     setSearchParams({ conflict: id }, { replace: true });
   };
 
