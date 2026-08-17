@@ -1,0 +1,1 @@
+import{j as r}from"./framer-motion-BD6DIj-9.js";import{e as s}from"./format-D9zXPVGl.js";function m({children:t,className:a=""}){return r.jsx("span",{className:`uf-mono text-[12px] tracking-tight ${a}`,children:t})}function n({iso:t,className:a=""}){return r.jsx("span",{className:`uf-mono text-[11px] text-[var(--uf-text-tertiary)] ${a}`,children:s(t)})}export{m as M,n as T};
