@@ -1,24 +1,24 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Link } from "react-router";
 import {
   useConflicts,
   useProductDna,
   useProducts,
   useSuppliers,
 } from "@/hooks/use-forge-store";
+import type { PipelineStage } from "@/types/domain";
 import { formatPercent, formatTimestamp } from "@/utils/format";
-import { STAGES } from "@/utils/pipeline";
 import { statusTone, type StatusTone } from "@/utils/status";
 import { DnaRecord } from "./DnaRecord";
+import { VERIFY_STAGES, VerificationPipeline, type PipelineState } from "./VerificationPipeline";
 
 /**
- * PRODUCT DNA — the canonical, authoritative product record.
- * A flat, continuous engineering workspace: identity line, process rail,
- * record line, then the attribute matrix. No cards, panels, tiles or boxes —
- * information is printed directly onto the workspace. Motion is one-shot,
- * purposeful and fast: a data-flow pulse through the rail, a single
- * verification scan across the workspace, staggered row reveals.
+ * PRODUCT DNA — the live verification workspace.
+ * Compact identity line, then the animated verification pipeline
+ * (INGEST → NORMALIZE → VERIFY → CONFLICT → CANONICALIZE → SHIP),
+ * a flat record switcher, and the living engineering record below.
+ * No cards, no boxes — the workspace is one continuous surface where
+ * the record visibly comes alive on load.
  */
 
 const TONE_COLOR: Record<StatusTone, string> = {
@@ -29,9 +29,49 @@ const TONE_COLOR: Record<StatusTone, string> = {
   neutral: "var(--uf-text-tertiary)",
 };
 
-const ACTIVE_STAGE = "PRODUCT_DNA";
-
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const STAGE_INDEX: Record<PipelineStage, number> = {
+  INTAKE: 0,
+  FORGE: 1,
+  PROVE: 2,
+  RESOLVE: 3,
+  PRODUCT_DNA: 4,
+  SHIP: 5,
+};
+
+/** Derive the verification pipeline state for a product record. */
+function pipelineState(
+  product: { stage: PipelineStage } | undefined,
+  openConflicts: number,
+): PipelineState {
+  const base = product ? STAGE_INDEX[product.stage] : 0;
+  if (openConflicts > 0) {
+    return {
+      passed: Math.max(3, base),
+      interruptAt: 3,
+      activeAt: null,
+      caption: "Flow interrupted — conflict detected at verify · human review required",
+      captionTone: "warning",
+    };
+  }
+  if (base >= VERIFY_STAGES.length - 1) {
+    return {
+      passed: VERIFY_STAGES.length - 1,
+      interruptAt: null,
+      activeAt: VERIFY_STAGES.length - 1,
+      caption: "Record verified — ready for shipment",
+      captionTone: "success",
+    };
+  }
+  return {
+    passed: base,
+    interruptAt: null,
+    activeAt: base,
+    caption: `Flow nominal — ${VERIFY_STAGES[base]} in progress`,
+    captionTone: "accent",
+  };
+}
 
 export default function ProductDNA() {
   const products = useProducts();
@@ -46,27 +86,13 @@ export default function ProductDNA() {
     ? conflicts.filter((c) => c.productId === selected.id && c.status === "OPEN")
     : [];
 
-  const activeIdx = STAGES.findIndex((s) => s.stage === ACTIVE_STAGE);
-
   return (
     /* full-bleed solid workspace — no decorative background texture */
     <div className="relative -mx-4 -my-6 flex flex-col bg-[var(--uf-bg)] px-4 py-6 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
-      {/* one-shot verification scan across the workspace, per record */}
-      {selected && (
-        <motion.span
-          key={`scan-${selected.id}`}
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[var(--uf-accent)]"
-          initial={{ top: "0%", opacity: 0 }}
-          animate={{ top: ["0%", "100%"], opacity: [0, 0.28, 0] }}
-          transition={{ duration: 1.05, times: [0, 0.5, 1], ease: "easeInOut", delay: 0.16 }}
-        />
-      )}
-
       {/* flat identity header — printed line, no boxes */}
       {dna && selected && (
         <section
-          key={selected.id}
+          key={`head-${selected.id}`}
           aria-label="Product identity"
           className="border-b border-[var(--uf-border-faint)]"
         >
@@ -123,81 +149,22 @@ export default function ProductDNA() {
               </span>
               <Sep />
               <span className="text-[var(--uf-text-secondary)]">
-                confidence <span className="text-[var(--uf-accent)]">{formatPercent(dna.confidence)}</span>
+                confidence{" "}
+                <span className="text-[var(--uf-accent)]">{formatPercent(dna.confidence)}</span>
               </span>
             </p>
           </motion.div>
         </section>
       )}
 
-      {/* pipeline rail — one thin horizontal process line */}
-      <section
-        aria-label="Pipeline stages"
-        className="relative flex items-center overflow-x-auto py-2.5 scrollbar-none"
-      >
-        {/* data-flow pulse — travels the rail once per record */}
-        {selected && (
-          <motion.span
-            key={`flow-${selected.id}`}
-            aria-hidden
-            className="pointer-events-none absolute top-0 bottom-0 w-[3px] bg-[var(--uf-accent)]"
-            initial={{ left: "2%", opacity: 0 }}
-            animate={{ left: ["2%", "98%"], opacity: [0, 0.5, 0] }}
-            transition={{ duration: 0.85, times: [0, 0.5, 1], ease: "easeInOut" }}
+      {/* live verification pipeline — the record's analysis flow */}
+      {selected && (
+        <div key={`pipe-${selected.id}`}>
+          <VerificationPipeline
+            state={pipelineState(selected, openConflicts.length)}
           />
-        )}
-        {STAGES.map((stage, i) => {
-          const active = stage.stage === ACTIVE_STAGE;
-          const review = stage.stage === "RESOLVE" && openConflicts.length > 0;
-          const passed = i < activeIdx;
-          return (
-            <div key={stage.stage} className="flex shrink-0 items-center">
-              <Link
-                to={stage.path}
-                aria-current={active ? "step" : undefined}
-                className={`relative whitespace-nowrap px-1 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] [font-family:var(--uf-font-condensed)] transition-colors ${
-                  active
-                    ? "text-[var(--uf-accent)]"
-                    : review
-                      ? "text-[var(--uf-warning)]"
-                      : passed
-                        ? "text-[var(--uf-text-secondary)] hover:text-[var(--uf-text-primary)]"
-                        : "text-[var(--uf-text-tertiary)] hover:text-[var(--uf-text-secondary)]"
-                }`}
-              >
-                {stage.label}
-                {review && (
-                  <span className="ml-1.5 inline-flex items-center gap-1 align-middle">
-                    <span className="uf-dot uf-dot-warning uf-anim-pulse" aria-hidden />
-                    <span className="uf-mono text-[8px] uppercase tracking-[0.1em] text-[var(--uf-warning)]">
-                      Review
-                    </span>
-                  </span>
-                )}
-                {active && (
-                  <motion.span
-                    aria-hidden
-                    className="absolute inset-x-0 bottom-0 h-[2px] bg-[var(--uf-accent)]"
-                    style={{ transformOrigin: "left" }}
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    animate={{ scaleX: 1, opacity: [0.65, 1, 0.65] }}
-                    transition={{
-                      scaleX: { duration: 0.38, ease: EASE },
-                      opacity: { duration: 3.4, repeat: Infinity, ease: "easeInOut" },
-                    }}
-                  />
-                )}
-              </Link>
-              {i < STAGES.length - 1 && (
-                <span
-                  className="h-px w-6 shrink-0 bg-[var(--uf-border-strong)] md:w-10"
-                  aria-hidden
-                />
-              )}
-            </div>
-          );
-        })}
-      </section>
+        </div>
+      )}
 
       {/* record line — flat text switcher, no boxes */}
       <section
@@ -209,7 +176,6 @@ export default function ProductDNA() {
         </span>
         {withStructure.map((p, idx) => {
           const active = p.id === selected?.id;
-          const verified = p.attributes.filter((a) => a.verification === "VERIFIED").length;
           const dot = TONE_COLOR[statusTone(p.status)];
           return (
             <span key={p.id} className="flex shrink-0 items-center gap-2.5">
