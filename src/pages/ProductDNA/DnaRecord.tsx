@@ -23,13 +23,16 @@ interface DnaRecordProps {
 /**
  * The attribute matrix — the workspace itself.
  * ATTRIBUTE | VALUE | CONFIDENCE | EVIDENCE | STATE.
- * The canonical value carries its source trace directly beneath it;
- * the EVIDENCE column shows what each source actually claimed.
+ * One continuous technical table printed directly on the workspace:
+ * no cards, no panels, no containers. The canonical value carries its
+ * source trace directly beneath it; the EVIDENCE column shows what each
+ * source actually claimed. Conflicts are a thin amber rule on the row's
+ * left edge with a faint tint — never a box.
  */
 
 const HEADERS = ["Attribute", "Value", "Confidence", "Evidence", "State"];
 
-/** Flat, compact verification flags — icon + label, no chips. */
+/** Flat verification flags — icon + label, no chips, no boxes. */
 const STATE_META: Record<
   VerificationStatus,
   { label: string; color: string; Icon: LucideIcon; spin?: boolean }
@@ -115,7 +118,7 @@ export function DnaRecord({ productId }: DnaRecordProps) {
 
   return (
     <div>
-      {/* attribute matrix — continuous technical table */}
+      {/* attribute matrix — the workspace itself, no container */}
       <section className="overflow-x-auto" aria-label="Attribute matrix">
         <table className="w-full min-w-[1080px] border-collapse text-left">
           <thead>
@@ -143,18 +146,18 @@ export function DnaRecord({ productId }: DnaRecordProps) {
         </table>
       </section>
 
-      {/* footer — record state + actions */}
-      <section className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--uf-border-faint)] py-4">
+      {/* footer strip — record state + flat text actions */}
+      <section className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-[var(--uf-border-faint)] py-4">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
           {openConflicts.length > 0 ? (
-            <span className="flex items-center gap-2 text-[11.5px] text-[var(--uf-warning)]">
+            <span className="flex items-center gap-2 text-[11.5px] font-medium text-[var(--uf-warning)]">
               <AlertTriangle className="size-3.5" aria-hidden />
               {openConflicts.length} open conflict{openConflicts.length > 1 ? "s" : ""} — record
               not canonical
             </span>
           ) : (
-            <span className="flex items-center gap-2 text-[11.5px] text-[var(--uf-success)]">
-              <span className="uf-dot uf-dot-success" aria-hidden />
+            <span className="flex items-center gap-2 text-[11.5px] font-medium text-[var(--uf-success)]">
+              <span className="h-1.5 w-1.5" style={{ background: "var(--uf-success)" }} aria-hidden />
               Fully verified — no open conflicts
             </span>
           )}
@@ -163,12 +166,12 @@ export function DnaRecord({ productId }: DnaRecordProps) {
             {String(dna.revision).padStart(2, "0")} · {dna.totalCount} attributes
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-x-5">
           {openConflicts[0] && (
             <button
               type="button"
               onClick={() => navigate(`/resolve?conflict=${openConflicts[0].id}`)}
-              className="uf-mono inline-flex items-center gap-1.5 border border-[var(--uf-warning-line)] bg-[var(--uf-warning-dim)] px-3.5 py-2 text-[10.5px] uppercase tracking-[0.08em] text-[var(--uf-warning)] transition-colors hover:bg-[var(--uf-warning)] hover:text-[var(--uf-bg)]"
+              className="uf-mono inline-flex items-center gap-1.5 text-[10.5px] font-medium uppercase tracking-[0.1em] text-[var(--uf-warning)] underline-offset-4 transition-colors hover:text-[var(--uf-accent-bright)] hover:underline"
             >
               <Scale className="size-3.5" aria-hidden />
               Review conflict
@@ -177,7 +180,7 @@ export function DnaRecord({ productId }: DnaRecordProps) {
           <button
             type="button"
             onClick={() => exportDna(dna)}
-            className="uf-mono inline-flex items-center gap-1.5 bg-[var(--uf-accent)] px-3.5 py-2 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[var(--uf-primary-foreground)] transition-colors hover:bg-[var(--uf-accent-bright)]"
+            className="uf-mono inline-flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[var(--uf-accent)] underline-offset-4 transition-colors hover:text-[var(--uf-accent-bright)] hover:underline"
           >
             <Download className="size-3.5" aria-hidden />
             Export DNA
@@ -224,7 +227,7 @@ function Row({
       }`}
     >
       {/* ATTRIBUTE */}
-      <td className="w-[200px] px-5 py-5 align-top">
+      <td className="w-[200px] px-5 py-6 align-top">
         <p className="text-[13.5px] font-semibold tracking-tight text-[var(--uf-text-primary)]">
           {attribute.label}
         </p>
@@ -233,9 +236,9 @@ function Row({
         </p>
       </td>
 
-      {/* VALUE — canonical value with source trace beneath */}
-      <td className="w-[360px] px-5 py-5 align-top">
-        <p className="uf-mono text-[14px] font-medium leading-snug text-[var(--uf-text-primary)]">
+      {/* VALUE — canonical value with source trace directly beneath */}
+      <td className="w-[360px] px-5 py-6 align-top">
+        <p className="uf-mono text-[14.5px] font-medium leading-snug text-[var(--uf-text-primary)]">
           {attribute.value}
           {attribute.unit ? (
             <span className="text-[var(--uf-text-tertiary)]"> {attribute.unit}</span>
@@ -257,7 +260,7 @@ function Row({
       </td>
 
       {/* CONFIDENCE — thin technical bar */}
-      <td className="w-[150px] px-5 py-5 align-top">
+      <td className="w-[150px] px-5 py-6 align-top">
         <div className="flex flex-col gap-2">
           <div
             className="h-[3px] w-[76px] bg-[var(--uf-border-faint)]"
@@ -275,7 +278,7 @@ function Row({
       </td>
 
       {/* EVIDENCE — what each source claimed */}
-      <td className="min-w-[300px] px-5 py-5 align-top">
+      <td className="min-w-[300px] px-5 py-6 align-top">
         {sources.length > 0 ? (
           <ul className="space-y-2">
             {sources.map((src, i) => {
@@ -292,11 +295,7 @@ function Row({
                   key={`${src.document}-${i}`}
                   className="grid grid-cols-[auto_1fr_auto] items-baseline gap-x-2.5"
                 >
-                  <span
-                    className="size-1.5 self-center rounded-full"
-                    style={{ background: tone }}
-                    aria-hidden
-                  />
+                  <span className="h-1.5 w-1.5 self-center" style={{ background: tone }} aria-hidden />
                   <span className="uf-mono min-w-0 text-[10.5px] text-[var(--uf-text-secondary)]">
                     {src.value}
                   </span>
@@ -323,7 +322,7 @@ function Row({
         <button
           type="button"
           onClick={() => onTrace(attribute.key)}
-          className="uf-mono mt-3 inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.1em] text-[var(--uf-text-tertiary)] transition-colors hover:text-[var(--uf-accent)]"
+          className="uf-mono mt-3 inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.1em] text-[var(--uf-text-tertiary)] underline-offset-4 transition-colors hover:text-[var(--uf-accent)] hover:underline"
         >
           <BookOpen className="size-3" aria-hidden />
           Trace
@@ -331,7 +330,7 @@ function Row({
       </td>
 
       {/* STATE — compact verification flag */}
-      <td className="w-[140px] px-5 py-5 align-top">
+      <td className="w-[140px] px-5 py-6 align-top">
         <span
           className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] [font-family:var(--uf-font-condensed)]"
           style={{ color: state.color }}

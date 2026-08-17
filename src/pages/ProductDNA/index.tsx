@@ -13,8 +13,9 @@ import { DnaRecord } from "./DnaRecord";
 
 /**
  * PRODUCT DNA — the canonical, authoritative product record.
- * One continuous engineering workspace:
- *   compact identity header → pipeline rail → record selector → attribute matrix.
+ * A flat, continuous engineering workspace: identity line, process rail,
+ * record line, then the attribute matrix. No cards, panels, tiles or boxes —
+ * information is printed directly onto the workspace.
  */
 
 const TONE_COLOR: Record<StatusTone, string> = {
@@ -45,186 +46,152 @@ export default function ProductDNA() {
   return (
     /* full-bleed solid workspace — no decorative background texture */
     <div className="relative -mx-4 -my-6 flex flex-col bg-[var(--uf-bg)] px-4 py-6 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
-      {/* compact product identity header */}
+      {/* flat identity header — printed line, no boxes */}
       {dna && selected && (
         <section
           aria-label="Product identity"
           className="border-b border-[var(--uf-border-faint)]"
         >
-          <div className="flex flex-wrap items-center justify-between gap-x-10 gap-y-4 py-4">
+          <div className="flex flex-wrap items-start justify-between gap-x-10 gap-y-4 py-5">
             <div className="min-w-0">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                <h1 className="uf-mono text-[21px] font-semibold tracking-tight text-[var(--uf-text-primary)]">
+                <h1 className="uf-mono text-[24px] font-semibold leading-none tracking-tight text-[var(--uf-text-primary)]">
                   {dna.mpn}
                 </h1>
-                <span aria-hidden className="text-[13px] text-[var(--uf-text-tertiary)]">
+                <span aria-hidden className="text-[15px] text-[var(--uf-text-tertiary)]">
                   ·
                 </span>
-                <span className="text-[15px] font-semibold uppercase tracking-[0.08em] text-[var(--uf-text-secondary)] [font-family:var(--uf-font-condensed)]">
+                <span className="text-[16px] font-semibold uppercase tracking-[0.08em] text-[var(--uf-text-secondary)] [font-family:var(--uf-font-condensed)]">
                   {dna.name}
                 </span>
               </div>
-              <dl className="mt-2.5 flex flex-wrap items-center gap-x-6 gap-y-1.5">
-                <Meta label="Product ID" value={dna.productId} />
-                <Meta label="Supplier" value={supplier?.name ?? "—"} />
-                <Meta label="Category" value={dna.category} />
-                <Meta label="Revision" value={String(dna.revision).padStart(2, "0")} />
-                <Meta label="Last verified" value={formatTimestamp(dna.lastVerifiedAt)} />
-              </dl>
+              <p className="mt-2.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 text-[11px] leading-relaxed">
+                <MetaInline label="Product ID" value={dna.productId} />
+                <Sep />
+                <MetaInline label="Supplier" value={supplier?.name ?? "—"} />
+                <Sep />
+                <MetaInline label="Category" value={dna.category} />
+                <Sep />
+                <MetaInline label="Revision" value={String(dna.revision).padStart(2, "0")} />
+                <Sep />
+                <MetaInline label="Last verified" value={formatTimestamp(dna.lastVerifiedAt)} />
+              </p>
             </div>
-
-            {/* record readouts — plain label/value, hairline dividers, no boxes */}
-            <div className="flex shrink-0 items-stretch divide-x divide-[var(--uf-border-faint)]">
-              <Readout
-                label="Record state"
-                value={
-                  openConflicts.length > 0
-                    ? "Requires review"
-                    : dna.verifiedCount === dna.totalCount
-                      ? "Verified"
-                      : "In progress"
-                }
-                tone={
-                  openConflicts.length > 0
-                    ? "var(--uf-warning)"
-                    : dna.verifiedCount === dna.totalCount
-                      ? "var(--uf-success)"
-                      : "var(--uf-accent)"
-                }
-              />
-              <Readout
-                label="Verified"
-                value={`${dna.verifiedCount}/${dna.totalCount}`}
-                tone="var(--uf-success)"
-              />
-              <Readout
-                label="Confidence"
-                value={formatPercent(dna.confidence)}
-                tone="var(--uf-accent)"
-              />
-            </div>
+            <p className="uf-mono shrink-0 pt-1 text-right text-[11px] leading-relaxed">
+              <span
+                style={{
+                  color:
+                    openConflicts.length > 0
+                      ? "var(--uf-warning)"
+                      : dna.verifiedCount === dna.totalCount
+                        ? "var(--uf-success)"
+                        : "var(--uf-accent)",
+                }}
+              >
+                {openConflicts.length > 0
+                  ? "Requires review"
+                  : dna.verifiedCount === dna.totalCount
+                    ? "Verified"
+                    : "In progress"}
+              </span>
+              <Sep />
+              <span className="text-[var(--uf-text-secondary)]">
+                {dna.verifiedCount}/{dna.totalCount} verified
+              </span>
+              <Sep />
+              <span className="text-[var(--uf-text-secondary)]">
+                confidence <span className="text-[var(--uf-accent)]">{formatPercent(dna.confidence)}</span>
+              </span>
+            </p>
           </div>
         </section>
       )}
 
-      {/* pipeline rail — thin horizontal process line, PRODUCT DNA active,
-          RESOLVE flagged when the selected record has open conflicts */}
-      <section aria-label="Pipeline stages" className="border-b border-[var(--uf-border-faint)]">
-        <div className="flex items-center overflow-x-auto py-1.5 scrollbar-none">
-          {STAGES.map((stage, i) => {
-            const active = stage.stage === ACTIVE_STAGE;
-            const review = stage.stage === "RESOLVE" && openConflicts.length > 0;
-            const passed = i < activeIdx;
-            return (
-              <div key={stage.stage} className="flex shrink-0 items-center">
-                <Link
-                  to={stage.path}
-                  aria-current={active ? "step" : undefined}
-                  className={`relative flex items-center gap-2 px-3 py-2 transition-colors md:px-4 ${
-                    active
-                      ? "text-[var(--uf-text-primary)]"
-                      : review
-                        ? "text-[var(--uf-warning)]"
-                        : passed
-                          ? "text-[var(--uf-text-secondary)] hover:text-[var(--uf-text-primary)]"
-                          : "text-[var(--uf-text-tertiary)] hover:text-[var(--uf-text-secondary)]"
-                  }`}
-                >
-                  <span
-                    className={`uf-mono text-[9px] ${
-                      active ? "text-[var(--uf-accent)]" : "text-[var(--uf-text-tertiary)]"
-                    }`}
-                  >
-                    {stage.index}
-                  </span>
-                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] [font-family:var(--uf-font-condensed)]">
-                    {stage.label}
-                  </span>
-                  {review && (
-                    <span className="flex items-center gap-1" aria-label="Open conflicts require review">
-                      <span className="uf-dot uf-dot-warning" aria-hidden />
-                      <span className="uf-mono text-[8px] uppercase tracking-[0.1em] text-[var(--uf-warning)]">
-                        Review
-                      </span>
+      {/* pipeline rail — one thin horizontal process line */}
+      <section
+        aria-label="Pipeline stages"
+        className="flex items-center overflow-x-auto py-2.5 scrollbar-none"
+      >
+        {STAGES.map((stage, i) => {
+          const active = stage.stage === ACTIVE_STAGE;
+          const review = stage.stage === "RESOLVE" && openConflicts.length > 0;
+          const passed = i < activeIdx;
+          return (
+            <div key={stage.stage} className="flex shrink-0 items-center">
+              <Link
+                to={stage.path}
+                aria-current={active ? "step" : undefined}
+                className={`relative whitespace-nowrap px-1 py-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] [font-family:var(--uf-font-condensed)] transition-colors ${
+                  active
+                    ? "text-[var(--uf-accent)]"
+                    : review
+                      ? "text-[var(--uf-warning)]"
+                      : passed
+                        ? "text-[var(--uf-text-secondary)] hover:text-[var(--uf-text-primary)]"
+                        : "text-[var(--uf-text-tertiary)] hover:text-[var(--uf-text-secondary)]"
+                }`}
+              >
+                {stage.label}
+                {review && (
+                  <span className="ml-1.5 inline-flex items-center gap-1 align-middle">
+                    <span className="uf-dot uf-dot-warning" aria-hidden />
+                    <span className="uf-mono text-[8px] uppercase tracking-[0.1em] text-[var(--uf-warning)]">
+                      Review
                     </span>
-                  )}
-                  {active && (
-                    <span
-                      className="absolute inset-x-2 bottom-0 h-[2px] bg-[var(--uf-accent)]"
-                      aria-hidden
-                    />
-                  )}
-                </Link>
-                {i < STAGES.length - 1 && (
-                  <span
-                    className={`h-px w-5 md:w-9 ${
-                      passed || review
-                        ? "bg-[var(--uf-border-strong)]"
-                        : "bg-[var(--uf-border)]"
-                    }`}
-                    aria-hidden
-                  />
+                  </span>
                 )}
-              </div>
-            );
-          })}
-          <span className="uf-mono ml-auto hidden shrink-0 pl-4 text-[9px] uppercase tracking-[0.14em] text-[var(--uf-text-tertiary)] lg:block">
-            Stage 05 / 06 · canonical product truth
-          </span>
-        </div>
+                {active && (
+                  <span className="absolute inset-x-0 bottom-0 h-[2px] bg-[var(--uf-accent)]" aria-hidden />
+                )}
+              </Link>
+              {i < STAGES.length - 1 && (
+                <span
+                  className="h-px w-6 shrink-0 bg-[var(--uf-border-strong)] md:w-10"
+                  aria-hidden
+                />
+              )}
+            </div>
+          );
+        })}
       </section>
 
-      {/* record selector — flat strip, hairline dividers */}
+      {/* record line — flat text switcher, no boxes */}
       <section
         aria-label="Canonical records"
-        className="flex items-stretch overflow-x-auto border-b border-[var(--uf-border-faint)] scrollbar-none"
+        className="flex items-center overflow-x-auto border-b border-[var(--uf-border-faint)] py-2 scrollbar-none"
       >
-        <div className="flex shrink-0 items-center gap-2 border-r border-[var(--uf-border-faint)] px-4">
-          <span className="uf-mono text-[9px] uppercase tracking-[0.14em] text-[var(--uf-text-tertiary)]">
-            Records
-          </span>
-          <span className="uf-mono text-[9.5px] text-[var(--uf-text-tertiary)]">
-            {withStructure.length}
-          </span>
-        </div>
-        {withStructure.map((p) => {
+        <span className="uf-mono shrink-0 text-[9px] uppercase tracking-[0.14em] text-[var(--uf-text-tertiary)]">
+          Records
+        </span>
+        {withStructure.map((p, idx) => {
           const active = p.id === selected?.id;
           const verified = p.attributes.filter((a) => a.verification === "VERIFIED").length;
           const dot = TONE_COLOR[statusTone(p.status)];
           return (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => setSelectedId(p.id)}
-              aria-pressed={active}
-              className={`relative flex shrink-0 items-center gap-2.5 border-r border-[var(--uf-border-faint)] px-4 py-2.5 text-left transition-colors ${
-                active
-                  ? "bg-[rgba(255,255,255,0.03)]"
-                  : "hover:bg-[rgba(255,255,255,0.02)]"
-              }`}
-            >
-              {active && (
-                <span className="absolute inset-y-0 left-0 w-[2px] bg-[var(--uf-accent)]" aria-hidden />
+            <span key={p.id} className="flex shrink-0 items-center gap-2.5">
+              {idx > 0 && (
+                <span aria-hidden className="text-[10px] text-[var(--uf-border-strong)]">
+                  ·
+                </span>
               )}
-              <span className="uf-dot" style={{ background: dot }} aria-hidden />
-              <span
-                className={`uf-mono text-[11px] font-medium ${
-                  active ? "text-[var(--uf-accent)]" : "text-[var(--uf-text-primary)]"
+              <button
+                type="button"
+                onClick={() => setSelectedId(p.id)}
+                aria-pressed={active}
+                className={`inline-flex items-center gap-1.5 transition-opacity ${
+                  active ? "" : "opacity-70 hover:opacity-100"
                 }`}
               >
-                {p.mpn}
-              </span>
-              <span className="hidden text-[11px] text-[var(--uf-text-secondary)] md:inline">
-                {p.name}
-              </span>
-              <span
-                className={`uf-mono text-[9px] ${
-                  active ? "text-[var(--uf-accent)]" : "text-[var(--uf-text-tertiary)]"
-                }`}
-              >
-                {verified}/{p.attributes.length}
-              </span>
-            </button>
+                <span className="h-1.5 w-1.5 shrink-0" style={{ background: dot }} aria-hidden />
+                <span
+                  className={`uf-mono text-[10.5px] font-medium ${
+                    active ? "text-[var(--uf-accent)]" : "text-[var(--uf-text-secondary)]"
+                  }`}
+                >
+                  {p.mpn}
+                </span>
+              </button>
+            </span>
           );
         })}
       </section>
@@ -242,26 +209,18 @@ export default function ProductDNA() {
   );
 }
 
-function Meta({ label, value }: { label: string; value: string }) {
+function MetaInline({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <dt className="uf-mono text-[8.5px] uppercase tracking-[0.14em] text-[var(--uf-text-tertiary)]">
-        {label}
-      </dt>
-      <dd className="uf-mono mt-0.5 text-[11px] text-[var(--uf-text-primary)]">{value}</dd>
-    </div>
+    <span className="uf-mono whitespace-nowrap text-[var(--uf-text-tertiary)]">
+      {label} <span className="text-[var(--uf-text-secondary)]">{value}</span>
+    </span>
   );
 }
 
-function Readout({ label, value, tone }: { label: string; value: string; tone: string }) {
+function Sep() {
   return (
-    <div className="px-5 py-1">
-      <p className="uf-mono text-[8.5px] uppercase tracking-[0.14em] text-[var(--uf-text-tertiary)]">
-        {label}
-      </p>
-      <p className="uf-mono mt-1 text-[12.5px] font-semibold" style={{ color: tone }}>
-        {value}
-      </p>
-    </div>
+    <span aria-hidden className="shrink-0 text-[9px] text-[var(--uf-border-strong)]">
+      ·
+    </span>
   );
 }
