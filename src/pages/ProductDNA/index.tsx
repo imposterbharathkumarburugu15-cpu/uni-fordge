@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { Link } from "react-router";
 import {
@@ -15,7 +16,9 @@ import { DnaRecord } from "./DnaRecord";
  * PRODUCT DNA — the canonical, authoritative product record.
  * A flat, continuous engineering workspace: identity line, process rail,
  * record line, then the attribute matrix. No cards, panels, tiles or boxes —
- * information is printed directly onto the workspace.
+ * information is printed directly onto the workspace. Motion is one-shot,
+ * purposeful and fast: a data-flow pulse through the rail, a single
+ * verification scan across the workspace, staggered row reveals.
  */
 
 const TONE_COLOR: Record<StatusTone, string> = {
@@ -27,6 +30,8 @@ const TONE_COLOR: Record<StatusTone, string> = {
 };
 
 const ACTIVE_STAGE = "PRODUCT_DNA";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function ProductDNA() {
   const products = useProducts();
@@ -46,13 +51,31 @@ export default function ProductDNA() {
   return (
     /* full-bleed solid workspace — no decorative background texture */
     <div className="relative -mx-4 -my-6 flex flex-col bg-[var(--uf-bg)] px-4 py-6 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+      {/* one-shot verification scan across the workspace, per record */}
+      {selected && (
+        <motion.span
+          key={`scan-${selected.id}`}
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-[var(--uf-accent)]"
+          initial={{ top: "0%", opacity: 0 }}
+          animate={{ top: ["0%", "100%"], opacity: [0, 0.28, 0] }}
+          transition={{ duration: 1.05, times: [0, 0.5, 1], ease: "easeInOut", delay: 0.16 }}
+        />
+      )}
+
       {/* flat identity header — printed line, no boxes */}
       {dna && selected && (
         <section
+          key={selected.id}
           aria-label="Product identity"
           className="border-b border-[var(--uf-border-faint)]"
         >
-          <div className="flex flex-wrap items-start justify-between gap-x-10 gap-y-4 py-5">
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.32, ease: EASE }}
+            className="flex flex-wrap items-start justify-between gap-x-10 gap-y-4 py-5"
+          >
             <div className="min-w-0">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
                 <h1 className="uf-mono text-[24px] font-semibold leading-none tracking-tight text-[var(--uf-text-primary)]">
@@ -103,15 +126,26 @@ export default function ProductDNA() {
                 confidence <span className="text-[var(--uf-accent)]">{formatPercent(dna.confidence)}</span>
               </span>
             </p>
-          </div>
+          </motion.div>
         </section>
       )}
 
       {/* pipeline rail — one thin horizontal process line */}
       <section
         aria-label="Pipeline stages"
-        className="flex items-center overflow-x-auto py-2.5 scrollbar-none"
+        className="relative flex items-center overflow-x-auto py-2.5 scrollbar-none"
       >
+        {/* data-flow pulse — travels the rail once per record */}
+        {selected && (
+          <motion.span
+            key={`flow-${selected.id}`}
+            aria-hidden
+            className="pointer-events-none absolute top-0 bottom-0 w-[3px] bg-[var(--uf-accent)]"
+            initial={{ left: "2%", opacity: 0 }}
+            animate={{ left: ["2%", "98%"], opacity: [0, 0.5, 0] }}
+            transition={{ duration: 0.85, times: [0, 0.5, 1], ease: "easeInOut" }}
+          />
+        )}
         {STAGES.map((stage, i) => {
           const active = stage.stage === ACTIVE_STAGE;
           const review = stage.stage === "RESOLVE" && openConflicts.length > 0;
@@ -134,14 +168,24 @@ export default function ProductDNA() {
                 {stage.label}
                 {review && (
                   <span className="ml-1.5 inline-flex items-center gap-1 align-middle">
-                    <span className="uf-dot uf-dot-warning" aria-hidden />
+                    <span className="uf-dot uf-dot-warning uf-anim-pulse" aria-hidden />
                     <span className="uf-mono text-[8px] uppercase tracking-[0.1em] text-[var(--uf-warning)]">
                       Review
                     </span>
                   </span>
                 )}
                 {active && (
-                  <span className="absolute inset-x-0 bottom-0 h-[2px] bg-[var(--uf-accent)]" aria-hidden />
+                  <motion.span
+                    aria-hidden
+                    className="absolute inset-x-0 bottom-0 h-[2px] bg-[var(--uf-accent)]"
+                    style={{ transformOrigin: "left" }}
+                    initial={{ scaleX: 0, opacity: 0 }}
+                    animate={{ scaleX: 1, opacity: [0.65, 1, 0.65] }}
+                    transition={{
+                      scaleX: { duration: 0.38, ease: EASE },
+                      opacity: { duration: 3.4, repeat: Infinity, ease: "easeInOut" },
+                    }}
+                  />
                 )}
               </Link>
               {i < STAGES.length - 1 && (
@@ -178,7 +222,7 @@ export default function ProductDNA() {
                 type="button"
                 onClick={() => setSelectedId(p.id)}
                 aria-pressed={active}
-                className={`inline-flex items-center gap-1.5 transition-opacity ${
+                className={`relative inline-flex items-center gap-1.5 transition-opacity ${
                   active ? "" : "opacity-70 hover:opacity-100"
                 }`}
               >
@@ -190,6 +234,14 @@ export default function ProductDNA() {
                 >
                   {p.mpn}
                 </span>
+                {active && (
+                  <motion.span
+                    layoutId="record-active-line"
+                    aria-hidden
+                    className="absolute inset-x-0 -bottom-[5px] h-[2px] bg-[var(--uf-accent)]"
+                    transition={{ duration: 0.32, ease: EASE }}
+                  />
+                )}
               </button>
             </span>
           );
